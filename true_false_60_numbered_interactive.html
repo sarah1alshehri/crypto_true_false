@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>True/False Interactive Quiz (60-numbered)</title>
+<style>
+  :root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --soft: #f0f4ff;
+    --text: #1f2a37;
+    --muted: #6b7280;
+    --ok: #16a34a;
+    --bad: #dc2626;
+    --btn: #2563eb;
+    --btn2:#7c3aed;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    margin: 0;
+    padding: 18px;
+    color: var(--text);
+  }
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  .top {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    margin-bottom: 14px;
+  }
+  h1 {
+    margin: 0 0 6px 0;
+    font-size: 20px;
+    line-height: 1.3;
+  }
+  .note {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-top: 12px;
+  }
+  button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .shuffle { background: var(--btn2); color: #fff; }
+  .reset { background: #111827; color: #fff; }
+  .showall { background: var(--btn); color: #fff; }
+  .score {
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .q {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 14px 14px 12px 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    margin-bottom: 12px;
+  }
+  .qbox {
+    background: var(--soft);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .qtitle {
+    margin: 0;
+    font-size: 15px;
+  }
+  .actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .t { background: var(--ok); color: #fff; }
+  .f { background: var(--bad); color: #fff; }
+  .result {
+    margin-top: 10px;
+    font-weight: 800;
+  }
+  .explain {
+    margin-top: 6px;
+    padding: 10px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.06);
+    display: none;
+  }
+  .explain .ar {
+    direction: rtl;
+    text-align: right;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .pill.ok { background: rgba(22,163,74,.12); color: var(--ok); }
+  .pill.bad { background: rgba(220,38,38,.12); color: var(--bad); }
+  .small {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>True / False Interactive Quiz</h1>
+    <p class="note">• After you answer, you’ll see a simple Arabic explanation. • Use Shuffle to mix questions.</p>
+    <div class="bar">
+      <button class="shuffle" onclick="shuffleQuestions()">🔀 Shuffle</button>
+      <button class="reset" onclick="resetQuiz()">♻️ Reset</button>
+      <button class="showall" onclick="toggleAllExplanations()">📘 Show/Hide all explanations</button>
+      <div class="score" id="scoreBox">Score: 0 / 0</div>
+    </div>
+    <div class="small">
+      Note: The source PDF numbers jump (11–21 are not present in the PDF’s True/False section). Some items (41–60) don’t show (True/False) on the sheet, so the answers here are based on standard cryptography knowledge.
+    </div>
+  </div>
+
+  <div id="quiz"></div>
+</div>
+
+<script>
+const ORIGINAL = [{"num": 1, "q": "Prime numbers have exactly two divisors: 1 and the number itself.", "a": true, "e": "العدد الأوّلي لا يقبل القسمة إلا على 1 وعلى نفسه فقط."}, {"num": 2, "q": "Mersenne primes are expressed as 2^n − 1, where n is a prime number.", "a": true, "e": "أعداد ميرسن تكون على صورة 2^n − 1، وغالبًا يُشترط أن n عدد أولي."}, {"num": 3, "q": "Fermat primes are written in the form 2^(2^k) + 1.", "a": true, "e": "أعداد فيرما تُكتب 2^(2^k)+1."}, {"num": 4, "q": "Co-prime numbers must share at least one common factor greater than 1.", "a": false, "e": "الأعداد المتباينة (Co-prime) لا تشترك بأي عامل أكبر من 1."}, {"num": 5, "q": "Two numbers are co-prime if their greatest common divisor (GCD) is 1.", "a": true, "e": "إذا كان القاسم المشترك الأكبر = 1 فهما متباينان."}, {"num": 6, "q": "A hash function always produces a variable-length output.", "a": false, "e": "دوال الهاش في العادة تُخرج طولًا ثابتًا (مثل 128/256/512 بت)."}, {"num": 7, "q": "The MD5 algorithm produces a 128-bit hash value.", "a": true, "e": "ناتج MD5 ثابت بطول 128 بت."}, {"num": 8, "q": "Whirlpool generates a fixed-length output of 512 bits.", "a": true, "e": "Whirlpool تعطي هاش بطول 512 بت."}, {"num": 9, "q": "HAVAL allows variable output sizes and rounds.", "a": true, "e": "HAVAL تدعم أحجام خرج مختلفة وعدد جولات قابل للتغيير."}, {"num": 10, "q": "Skein was submitted as a candidate for the SHA-3 competition.", "a": true, "e": "Skein كانت من خوارزميات المرشحين لمسابقة SHA-3."}, {"num": 22, "q": "NTLM hashing uses the MD4 algorithm for Windows password hashing.", "a": true, "e": "NTLM يعتمد على MD4 (لـ NT hash) في سياق كلمات مرور ويندوز."}, {"num": 23, "q": "NTLM hashing is considered secure for modern cryptographic applications.", "a": false, "e": "NTLM قديم ومعرّض لهجمات (مثل هجمات إعادة الاستخدام/القاموس) ولا يُعد خيارًا حديثًا."}, {"num": 24, "q": "HMAC ensures both message integrity and authentication.", "a": true, "e": "HMAC يحقق سلامة الرسالة (Integrity) ويعطي توثيقًا (Authentication) بمفتاح سري."}, {"num": 25, "q": "MAC (Message Authentication Code) is used to encrypt data.", "a": false, "e": "MAC لا يشفّر البيانات؛ وظيفته التحقق من السلامة والتوثيق."}, {"num": 26, "q": "Key stretching is used to make brute-force attacks more difficult.", "a": true, "e": "يزيد كلفة التخمين بتكرارات/عمل إضافي فيبطّئ الهجوم."}, {"num": 27, "q": "The Tiger hash function is optimized for 64-bit platforms.", "a": true, "e": "Tiger صُممت لتكون فعّالة على معالجات 64‑بت."}, {"num": 28, "q": "Blake was one of the candidates in the SHA-3 competition.", "a": true, "e": "BLAKE كانت ضمن مرشحي SHA-3."}, {"num": 29, "q": "RIPEMD-160 produces a 160-bit hash output.", "a": true, "e": "RIPEMD-160 ناتجها 160 بت."}, {"num": 30, "q": "The Lehmer RNG is a linear congruential generator.", "a": true, "e": "Lehmer RNG نوع من LCG يعتمد على حسابات توافقية (mod)."}, {"num": 31, "q": "Skein produces a fixed-length output of 128 bits.", "a": false, "e": "Skein يمكن أن تُنتج أطوالًا متعددة (ليست 128 فقط)."}, {"num": 32, "q": "Whirlpool is faster than MD5 for small data sets.", "a": false, "e": "MD5 عادةً أسرع بكثير؛ Whirlpool أثقل حسابيًا."}, {"num": 33, "q": "FORK-256 performs four parallel hash computations.", "a": true, "e": "FORK-256 تعتمد فكرة تنفيذ عدة مسارات/حسابات متوازية."}, {"num": 34, "q": "NTLM does not use a salt in its hashing process.", "a": true, "e": "NTLM التقليدي لا يضيف salt لكل كلمة مرور، وهذا يزيد قابلية هجمات الجداول."}, {"num": 35, "q": "In modular arithmetic, a ≡ b (mod n) implies n divides a − b.", "a": true, "e": "التطابق بالتوافق يعني أن الفرق a−b مضاعف لـ n."}, {"num": 36, "q": "Euler’s Totient Function gives the total count of divisors of a number.", "a": false, "e": "دالة φ(n) تعدّ الأعداد الأصغر من n والمشتركة معه بقاسم أكبر = 1 (أي المتباينة معه)."}, {"num": 37, "q": "A good PRNG provides unpredictability and uniform distribution.", "a": true, "e": "مولّد عشوائي جيد: لا يمكن توقعه بسهولة وتوزيعه قريب من المنتظم."}, {"num": 38, "q": "The Birthday Paradox is unrelated to hash functions.", "a": false, "e": "Birthday Paradox مهم جدًا لفهم احتمال التصادمات (collisions) في الهاش."}, {"num": 39, "q": "Adding salt to passwords helps prevent precomputed attacks.", "a": true, "e": "الـ salt يمنع جداول Rainbow ويجعل نفس كلمة المرور تنتج هاش مختلف."}, {"num": 40, "q": "Hash collisions are always impossible in cryptographic hash functions.", "a": false, "e": "التصادمات ممكنة نظريًا (بسبب مبدأ الحمامة)، لكن الهدف أن تكون صعبة عمليًا."}, {"num": 41, "q": "RSA security is based on the hardness of factoring large integers.", "a": true, "e": "الفكرة الأساسية: صعوبة تحليل n=pq إلى عوامله الكبيرة."}, {"num": 42, "q": "Diffie–Hellman provides authentication by default.", "a": false, "e": "DH لوحده يحقق مشاركة مفتاح، لكن بدون توثيق قد يتعرض لـ MITM."}, {"num": 43, "q": "MQV uses both static and ephemeral keys for improved security.", "a": true, "e": "MQV يمزج مفاتيح ثابتة ومؤقتة لرفع الأمان."}, {"num": 44, "q": "In DSA, reusing the same value of k is secure.", "a": false, "e": "إعادة استخدام k في DSA كارثي وقد يكشف المفتاح الخاص."}, {"num": 45, "q": "ECC achieves the same security as RSA with much smaller key sizes.", "a": true, "e": "ECC يعطي نفس مستوى الأمان بمفاتيح أصغر مقارنةً بـ RSA."}, {"num": 46, "q": "ElGamal encryption is deterministic.", "a": false, "e": "ElGamal يعتمد عشوائية k، لذلك هو غير حتمي (probabilistic)."}, {"num": 47, "q": "Cramer–Shoup protects against chosen-ciphertext attacks (CCA).", "a": true, "e": "Cramer–Shoup صُمم لمقاومة هجمات CCA."}, {"num": 48, "q": "SHA-256 is collision resistant.", "a": true, "e": "عمليًا يُعد مقاومًا للتصادمات في الاستخدامات الحالية."}, {"num": 49, "q": "MD5 is still considered secure for signatures today.", "a": false, "e": "MD5 غير آمن للتواقيع بسبب تصادمات عملية معروفة."}, {"num": 50, "q": "HMAC provides both integrity and authentication.", "a": true, "e": "HMAC يضمن سلامة الرسالة ويثبت أن من أنشأه يملك المفتاح."}, {"num": 51, "q": "PBKDF2 uses multiple iterations to slow down brute-force attacks.", "a": true, "e": "PBKDF2 تزيد التكرارات لرفع كلفة التخمين."}, {"num": 52, "q": "Forward Secrecy ensures past session keys remain secure even if long-term keys leak.", "a": true, "e": "حتى لو تسرّب المفتاح الطويل، تبقى جلسات الماضي آمنة إذا استُخدمت مفاتيح مؤقتة."}, {"num": 53, "q": "YAK protocol provides resistance to Unknown Key-Share attacks.", "a": true, "e": "YAK صُمم لتقليل/مقاومة UKS وفق تصميمه."}, {"num": 54, "q": "Elliptic curve point addition is a fundamental ECC operation.", "a": true, "e": "جمع النقاط أساس في عمليات ECC مثل الضرب القياسي."}, {"num": 55, "q": "ElGamal decryption requires computing the inverse of the shared secret.", "a": true, "e": "لفك التشفير نحتاج عكس (inverse) أو قسمة توافقية لإزالة أثر السر المشترك."}, {"num": 56, "q": "RSA requires the plaintext M to be smaller than modulus n.", "a": true, "e": "في RSA نعمل ضمن Z_n، لذا الرسالة/الكتلة يجب أن تكون < n (أو تُجزأ/تُحشى)."}, {"num": 57, "q": "Hash functions are reversible transformations.", "a": false, "e": "الهاش أحادي الاتجاه (One-way) وليس قابلاً للعكس."}, {"num": 58, "q": "The Diffie–Hellman shared key is computed as g^(ab) mod p.", "a": true, "e": "المفتاح المشترك K = g^(ab) mod p بعد تبادل القيم."}, {"num": 59, "q": "Cramer–Shoup uses two generators g1 and g2.", "a": true, "e": "من خصائصه استخدام مولّدين g1 و g2."}, {"num": 60, "q": "ECDH derives a shared key using scalar multiplication.", "a": true, "e": "ECDH يعتمد على ضرب نقطة المنحنى بعدد (scalar multiplication) لاشتقاق السر المشترك."}];
+let questions = ORIGINAL.map(x => ({...x, user:null}));
+
+function render() {
+  const quiz = document.getElementById('quiz');
+  quiz.innerHTML = '';
+  questions.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = 'q';
+    div.innerHTML = `
+      <div class="qbox">
+        <p class="qtitle"><b>#${item.num}</b> — ${escapeHtml(item.q)}</p>
+        <div class="actions">
+          <button class="t" onclick="answer(${idx}, true)">True</button>
+          <button class="f" onclick="answer(${idx}, false)">False</button>
+        </div>
+        <div class="result" id="res${idx}"></div>
+        <div class="explain" id="exp${idx}">
+          <div class="ar">📘 ${escapeHtml(item.e)}</div>
+        </div>
+      </div>
+    `;
+    quiz.appendChild(div);
+    // If already answered, show state
+    if(item.user !== null) {
+      paintResult(idx);
+    }
+  });
+  updateScore();
+}
+
+function escapeHtml(s) {
+  return s
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+function answer(idx, val) {
+  questions[idx].user = val;
+  paintResult(idx);
+  updateScore();
+}
+
+function paintResult(idx) {
+  const item = questions[idx];
+  const res = document.getElementById('res'+idx);
+  const exp = document.getElementById('exp'+idx);
+  const correct = (item.user === item.a);
+  res.innerHTML = correct
+    ? `✔ Correct <span class="pill ok">True answer: ${item.a ? 'True' : 'False'}</span>`
+    : `✖ Wrong <span class="pill bad">True answer: ${item.a ? 'True' : 'False'}</span>`;
+  res.style.color = correct ? 'var(--ok)' : 'var(--bad)';
+  exp.style.display = 'block';
+}
+
+function updateScore() {
+  let answered = 0, correct = 0;
+  questions.forEach(q => {
+    if(q.user !== null) {
+      answered++;
+      if(q.user === q.a) correct++;
+    }
+  });
+  document.getElementById('scoreBox').textContent = `Score: ${correct} / ${answered}`;
+}
+
+function shuffleQuestions() {
+  // Fisher-Yates shuffle
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  render();
+}
+
+function resetQuiz() {
+  questions = ORIGINAL.map(x => ({...x, user:null}));
+  render();
+}
+
+let showAll = false;
+function toggleAllExplanations() {
+  showAll = !showAll;
+  questions.forEach((_, idx) => {
+    const exp = document.getElementById('exp'+idx);
+    if(exp) exp.style.display = showAll ? 'block' : (questions[idx].user !== null ? 'block' : 'none');
+  });
+}
+
+render();
+</script>
+</body>
+</html>
